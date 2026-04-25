@@ -5,6 +5,11 @@ import * as path from 'path';
 export interface AdkProject {
   name: string;
   root: string;
+  /** Directory from which to run `adk web` / `adk api_server`.
+   *  When the workspace root is itself the agent package (has agent.py +
+   *  __init__.py at the top level), ADK must be run from the parent so it
+   *  can discover the package as a sub-folder. */
+  webRoot: string;
   agentFile: string;
   language: string;
 }
@@ -20,6 +25,22 @@ export function detectAdkProject(): AdkProject | null {
   return null;
 }
 
+/** Returns true when `dir` itself is an agent package (agent.py + __init__.py
+ *  at the top level). In this case adk web must run from the parent. */
+function isAgentPackage(dir: string): boolean {
+  return (
+    fs.existsSync(path.join(dir, '__init__.py')) &&
+    (fs.existsSync(path.join(dir, 'agent.py')) ||
+      fs.existsSync(path.join(dir, 'agent.ts')))
+  );
+}
+
+function resolveWebRoot(root: string): string {
+  // If the workspace root IS the agent package, adk web must run from parent
+  if (isAgentPackage(root)) return path.dirname(root);
+  return root;
+}
+
 function tryDetect(root: string): AdkProject | null {
   // Most reliable: .adk directory exists at root
   if (fs.existsSync(path.join(root, '.adk'))) {
@@ -27,6 +48,7 @@ function tryDetect(root: string): AdkProject | null {
     return {
       name: path.basename(root),
       root,
+      webRoot: resolveWebRoot(root),
       agentFile,
       language: agentFile.endsWith('.ts') ? 'TypeScript' : agentFile.endsWith('.go') ? 'Go' : 'Python',
     };
@@ -48,6 +70,7 @@ function tryDetect(root: string): AdkProject | null {
           return {
             name: path.basename(root),
             root,
+            webRoot: resolveWebRoot(root),
             agentFile,
             language: 'Python',
           };
@@ -62,7 +85,7 @@ function tryDetect(root: string): AdkProject | null {
   const agentFile = findAgentFile(root);
   if (agentFile) {
     const language = agentFile.endsWith('.ts') ? 'TypeScript' : agentFile.endsWith('.go') ? 'Go' : 'Python';
-    return { name: path.basename(root), root, agentFile, language };
+    return { name: path.basename(root), root, webRoot: resolveWebRoot(root), agentFile, language };
   }
 
   return null;

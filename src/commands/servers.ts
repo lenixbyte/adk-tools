@@ -7,6 +7,7 @@ import { isPortInUse, killPort, lsofPort } from '../utils/port';
 import { log, showOutput } from '../utils/output';
 import { getRunSettings } from '../utils/settings';
 
+
 let webTerminal: vscode.Terminal | undefined;
 let apiTerminal: vscode.Terminal | undefined;
 let pollTimer: ReturnType<typeof setInterval> | undefined;
@@ -56,8 +57,8 @@ export async function runWeb(statusBar: StatusBarManager, tree: AdkTreeProvider)
   const flags = buildFlags(settings, 'web');
   const cmd = env.adkCmd(`web${flags}`);
 
-  log(`Starting Web UI: ${cmd}`);
-  webTerminal = vscode.window.createTerminal({ name: 'ADK Web UI', cwd: project.root });
+  log(`Starting Web UI: ${cmd} (cwd: ${project.webRoot})`);
+  webTerminal = vscode.window.createTerminal({ name: 'ADK Web UI', cwd: project.webRoot });
   webTerminal.show();
   webTerminal.sendText(cmd);
 
@@ -98,8 +99,8 @@ export async function runApiServer(statusBar: StatusBarManager, tree: AdkTreePro
   const flags = buildFlags(settings, 'api_server');
   const cmd = env.adkCmd(`api_server${flags}`);
 
-  log(`Starting API Server: ${cmd}`);
-  apiTerminal = vscode.window.createTerminal({ name: 'ADK API Server', cwd: project.root });
+  log(`Starting API Server: ${cmd} (cwd: ${project.webRoot})`);
+  apiTerminal = vscode.window.createTerminal({ name: 'ADK API Server', cwd: project.webRoot });
   apiTerminal.show();
   apiTerminal.sendText(cmd);
 
