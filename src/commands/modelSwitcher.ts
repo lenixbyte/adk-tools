@@ -33,25 +33,73 @@ function httpsGet(url: string, headers: Record<string, string> = {}): Promise<st
   });
 }
 
-// Vertex AI publisher models API is not publicly listable — region-specific static lists
-const VERTEX_AI_MODELS_ASIA_SOUTH1: vscode.QuickPickItem[] = [
-  { label: 'gemini-2.5-flash-lite-preview-09-2025', description: 'Recommended for asia-south1' },
-  { label: 'gemini-2.5-flash-preview-04-17',        description: 'Fast + capable' },
-  { label: 'gemini-2.5-pro-preview-05-06',          description: 'Most capable' },
-  { label: 'gemini-1.5-flash-002',                  description: 'Previous gen — widely available' },
-  { label: 'gemini-1.5-pro-002',                    description: 'Previous gen Pro' },
-  { label: 'claude-3-5-sonnet@20241022',             description: 'Anthropic via Vertex AI' },
+// Fallback for Vertex AI when live fetch fails
+const FALLBACK_VERTEX_AI: vscode.QuickPickItem[] = [
+  { label: 'gemini-2.5-flash',     description: 'Fast + capable, latest generation' },
+  { label: 'gemini-2.5-pro',       description: 'Most capable' },
+  { label: 'gemini-1.5-flash-002', description: 'Previous gen — widely available' },
+  { label: 'gemini-1.5-pro-002',   description: 'Previous gen Pro' },
 ];
+
+async function getGcloudAccessToken(): Promise<string | undefined> {
+  try {
+    const { stdout } = await execAsync('gcloud auth print-access-token');
+    return stdout.trim();
+  } catch {
+    return undefined;
+  }
+}
+
+async function fetchVertexAiModels(
+  project: string,
+  region: string
+): Promise<vscode.QuickPickItem[]> {
+  const token = await getGcloudAccessToken();
+  if (!token) {
+    log('gcloud auth token unavailable — using fallback Vertex AI model list');
+    return FALLBACK_VERTEX_AI;
+  }
+
+  try {
+    const raw = await httpsGet(
+      `https://${region}-aiplatform.googleapis.com/v1/publishers/google/models?pageSize=200`,
+      { Authorization: `Bearer ${token}` }
+    );
+    const json = JSON.parse(raw);
+    const models: any[] = json.publisherModels ?? [];
+    const items: vscode.QuickPickItem[] = models
+      .filter((m: any) => {
+        const id: string = (m.name ?? '').toLowerCase();
+        return id.includes('gemini') && m.launchStage !== 'DEPRECATED';
+      })
+      .map((m: any) => {
+        const id = (m.name as string).replace(/^publishers\/google\/models\//, '');
+        const stage: string = m.launchStage ?? '';
+        const note = stage && stage !== 'GA' ? ` (${stage.toLowerCase()})` : '';
+        return { label: id, description: (m.title ?? '') + note };
+      });
+
+    if (items.length > 0) {
+      log(`Vertex AI live fetch: ${items.length} models for ${project}/${region}`);
+      return items;
+    }
+  } catch (e) {
+    log(`Vertex AI model fetch failed: ${e}`);
+  }
+
+  return FALLBACK_VERTEX_AI;
+}
 
 async function fetchLiveModels(
   useVertexAi: boolean,
   apiKey?: string,
-  _project?: string,
+  project?: string,
   region?: string
 ): Promise<vscode.QuickPickItem[]> {
   if (useVertexAi) {
-    if (region === 'asia-south1') return VERTEX_AI_MODELS_ASIA_SOUTH1;
-    return FALLBACK_GOOGLE_AI; // standard GA names work in all other supported regions
+    const loc = region ?? 'us-central1';
+    const proj = project ?? '';
+    return fetchVertexAiModels(proj, loc);
   }
 
   if (apiKey) {
@@ -110,12 +158,13 @@ export async function switchModel(): Promise<void> {
   const useVertexAi = ['1', 'true', 'yes'].includes(
     (readEnvVar(envFile, 'GOOGLE_GENAI_USE_VERTEXAI') ?? '').toLowerCase()
   );
-  const apiKey   = readEnvVar(envFile, 'GOOGLE_API_KEY');
-  const gcpRegion = readEnvVar(envFile, 'GOOGLE_CLOUD_LOCATION');
+  const apiKey    = readEnvVar(envFile, 'GOOGLE_API_KEY');
+  const gcpProject = readEnvVar(envFile, 'GOOGLE_CLOUD_PROJECT');
+  const gcpRegion  = readEnvVar(envFile, 'GOOGLE_CLOUD_LOCATION');
 
   const current = detectCurrentModel(project.agentFile);
 
-  const liveItems = fetchLiveModels(useVertexAi, apiKey, undefined, gcpRegion).then((items) =>
+  const liveItems = fetchLiveModels(useVertexAi, apiKey, gcpProject, gcpRegion).then((items) =>
     items.map((m) => ({
       ...m,
       picked: m.label === current,

@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+# Prevent parallel runs from racing on the same version
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    # Skip the bot's own changelog commit
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for changelog generation
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compile
+        run: npm run compile
+
+      # ── Version & tag check ────────────────────────────────────────────────
+      - name: Read version from package.json
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether this version is already tagged
+        id: tag
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ steps.pkg.outputs.version }}" >/dev/null 2>&1; then
+            echo "skip=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Changelog ──────────────────────────────────────────────────────────
+      - name: Generate release notes
+        if: steps.tag.outputs.skip == 'false'
+        run: |
+          PREV=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          RANGE="${PREV:+${PREV}..}HEAD"
+
+          feat=$(git log $RANGE --pretty=format:"- %s" --no-merges \
+            | grep  "^- feat" \
+            | sed   's/^- feat(\([^)]*\)): /- **\1**: /' \
+            | sed   's/^- feat: /- /' || true)
+
+          fix=$(git log $RANGE --pretty=format:"- %s" --no-merges \
+            | grep  "^- fix" \
+            | sed   's/^- fix(\([^)]*\)): /- **\1**: /' \
+            | sed   's/^- fix: /- /' || true)
+
+          docs=$(git log $RANGE --pretty=format:"- %s" --no-merges \
+            | grep  "^- docs" \
+            | sed   's/^- docs: /- /' || true)
+
+          other=$(git log $RANGE --pretty=format:"- %s" --no-merges \
+            | grep -Ev "^- (feat|fix|docs|chore)" || true)
+
+          {
+            [[ -n "$feat"  ]] && printf "### Features\n%s\n\n" "$feat"
+            [[ -n "$fix"   ]] && printf "### Bug Fixes\n%s\n\n" "$fix"
+            [[ -n "$docs"  ]] && printf "### Docs\n%s\n\n"     "$docs"
+            [[ -n "$other" ]] && printf "### Other\n%s\n\n"    "$other"
+          } > /tmp/release_notes.md
+
+          echo "--- generated release notes ---"
+          cat /tmp/release_notes.md
+
+      - name: Update CHANGELOG.md
+        if: steps.tag.outputs.skip == 'false'
+        run: |
+          VERSION="v${{ steps.pkg.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          HEADER="## $VERSION — $DATE"
+
+          if [ -f CHANGELOG.md ]; then
+            { printf "%s\n\n" "$HEADER"; cat /tmp/release_notes.md; echo; cat CHANGELOG.md; } \
+              > /tmp/new_changelog.md
+          else
+            { printf "# Changelog\n\n%s\n\n" "$HEADER"; cat /tmp/release_notes.md; } \
+              > /tmp/new_changelog.md
+          fi
+
+          mv /tmp/new_changelog.md CHANGELOG.md
+
+      - name: Commit & push changelog
+        if: steps.tag.outputs.skip == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          # commit exits non-zero when there's nothing to commit — ignore that
+          git commit -m "chore: update CHANGELOG for v${{ steps.pkg.outputs.version }} [skip ci]" || true
+          git push
+
+      # ── Package ────────────────────────────────────────────────────────────
+      - name: Package VSIX
+        if: steps.tag.outputs.skip == 'false'
+        run: npm run package
+
+      # ── GitHub Release ─────────────────────────────────────────────────────
+      - name: Create GitHub Release
+        if: steps.tag.outputs.skip == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: ADK Tools v${{ steps.pkg.outputs.version }}
+          body_path: /tmp/release_notes.md
+          files: "*.vsix"
+
+      # ── VS Code Marketplace (optional) ─────────────────────────────────────
+      # Add a VSCE_PAT secret in repo Settings → Secrets to enable this step.
+      - name: Publish to VS Code Marketplace
+        if: steps.tag.outputs.skip == 'false' && env.VSCE_PAT != ''
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx @vscode/vsce publish --pat "$VSCE_PAT"
