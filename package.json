@@ -2,7 +2,7 @@
   "name": "adk-tools",
   "displayName": "ADK Tools",
   "description": "Google Agent Development Kit — scaffold, run, deploy, and eval ADK agents from VS Code",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "lenixbyte",
   "engines": {
     "vscode": "^1.85.0"
