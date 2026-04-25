@@ -1,0 +1,216 @@
+{
+  "name": "adk-tools",
+  "displayName": "ADK Tools",
+  "description": "Google Agent Development Kit — scaffold, run, deploy, and eval ADK agents from VS Code",
+  "version": "1.0.0",
+  "publisher": "lenixbyte",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "keywords": ["adk", "google", "agent", "gemini", "vertex ai", "google cloud", "llm"],
+  "repository": { "type": "git", "url": "https://github.com/lenixbyte/adk-tools" },
+  "license": "Apache-2.0",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "adk.createProject",
+        "title": "Create New Agent Project",
+        "category": "ADK",
+        "icon": "$(add)"
+      },
+      {
+        "command": "adk.runWeb",
+        "title": "Run Web UI",
+        "category": "ADK",
+        "icon": "$(play)"
+      },
+      {
+        "command": "adk.runApiServer",
+        "title": "Run API Server",
+        "category": "ADK",
+        "icon": "$(play)"
+      },
+      {
+        "command": "adk.stopServers",
+        "title": "Stop All Servers",
+        "category": "ADK",
+        "icon": "$(stop)"
+      },
+      {
+        "command": "adk.openWebBrowser",
+        "title": "Open ADK Web UI in Browser",
+        "category": "ADK",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "adk.runCli",
+        "title": "Run CLI (adk run)",
+        "category": "ADK",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "adk.switchModel",
+        "title": "Switch Model",
+        "category": "ADK",
+        "icon": "$(symbol-enum)"
+      },
+      {
+        "command": "adk.runOptions",
+        "title": "Run Options",
+        "category": "ADK",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "adk.authWizard",
+        "title": "Auth Setup",
+        "category": "ADK",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "adk.deploy",
+        "title": "Deploy Agent",
+        "category": "ADK",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "adk.runEval",
+        "title": "Run Eval",
+        "category": "ADK",
+        "icon": "$(play-circle)"
+      },
+      {
+        "command": "adk.createEvalFile",
+        "title": "Generate Eval Cases",
+        "category": "ADK",
+        "icon": "$(add)"
+      },
+      {
+        "command": "adk.openConfig",
+        "title": "Open Agent File",
+        "category": "ADK",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "adk.openEnv",
+        "title": "Edit .env File",
+        "category": "ADK",
+        "icon": "$(key)"
+      },
+      {
+        "command": "adk.showEnvSummary",
+        "title": "Show .env Summary",
+        "category": "ADK"
+      },
+      {
+        "command": "adk.refresh",
+        "title": "Refresh",
+        "category": "ADK",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "adk.showMenu",
+        "title": "Open Command Menu",
+        "category": "ADK",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "adk.gettingStarted",
+        "title": "Getting Started",
+        "category": "ADK",
+        "icon": "$(book)"
+      },
+      {
+        "command": "adk.diagnostics",
+        "title": "Run Diagnostics",
+        "category": "ADK",
+        "icon": "$(pulse)"
+      },
+      {
+        "command": "adk.killPort",
+        "title": "Kill Port 8000",
+        "category": "ADK",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "adk.showOutput",
+        "title": "Show Output Log",
+        "category": "ADK",
+        "icon": "$(output)"
+      },
+      {
+        "command": "adk.openDocs",
+        "title": "Open ADK Documentation",
+        "category": "ADK",
+        "icon": "$(link-external)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "adk-explorer",
+          "title": "ADK Tools",
+          "icon": "resources/adk-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "adk-explorer": [
+        {
+          "id": "adkProjectView",
+          "name": "ADK Project"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "adk.refresh",
+          "when": "view == adkProjectView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "adk.createProject",
+          "when": "view == adkProjectView",
+          "group": "navigation@1"
+        }
+      ],
+      "commandPalette": [
+        { "command": "adk.openWebBrowser" },
+        { "command": "adk.runCli" },
+        { "command": "adk.switchModel" },
+        { "command": "adk.runOptions" },
+        { "command": "adk.authWizard" },
+        { "command": "adk.runEval" },
+        { "command": "adk.createEvalFile" }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./snippets/python.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/typescript.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}

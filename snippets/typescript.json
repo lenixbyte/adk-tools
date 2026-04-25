@@ -1,0 +1,83 @@
+{
+  "ADK Agent (TypeScript)": {
+    "prefix": "adk-agent",
+    "body": [
+      "import { LlmAgent } from '@google/adk';",
+      "",
+      "export const ${1:agentName} = new LlmAgent({",
+      "  name: '${2:my_agent}',",
+      "  model: '${3:gemini-2.0-flash}',",
+      "  description: '${4:Agent description}',",
+      "  instruction: '${5:You are a helpful assistant.}',",
+      "  tools: [${6}],",
+      "});"
+    ],
+    "description": "ADK LlmAgent (TypeScript)"
+  },
+  "ADK Root Agent (TypeScript)": {
+    "prefix": "adk-root",
+    "body": [
+      "import { LlmAgent } from '@google/adk';",
+      "",
+      "export const rootAgent = new LlmAgent({",
+      "  name: '${1:my_agent}',",
+      "  model: '${2:gemini-2.0-flash}',",
+      "  description: '${3:Root agent}',",
+      "  instruction: '${4:You are a helpful assistant.}',",
+      "  tools: [${5}],",
+      "});"
+    ],
+    "description": "ADK root agent entry point (TypeScript)"
+  },
+  "ADK Tool (TypeScript)": {
+    "prefix": "adk-tool",
+    "body": [
+      "import { FunctionTool } from '@google/adk';",
+      "",
+      "export const ${1:toolName} = new FunctionTool({",
+      "  name: '${2:tool_name}',",
+      "  description: '${3:What this tool does and when to use it.}',",
+      "  parameters: {",
+      "    type: 'object',",
+      "    properties: {",
+      "      ${4:param}: {",
+      "        type: 'string',",
+      "        description: '${5:Parameter description}',",
+      "      },",
+      "    },",
+      "    required: ['${4:param}'],",
+      "  },",
+      "  execute: async ({ ${4:param} }: { ${4:param}: string }) => {",
+      "    ${0:return { result: '' };}",
+      "  },",
+      "});"
+    ],
+    "description": "ADK FunctionTool (TypeScript)"
+  },
+  "ADK Sequential Agent (TypeScript)": {
+    "prefix": "adk-sequential",
+    "body": [
+      "import { SequentialAgent } from '@google/adk';",
+      "",
+      "export const ${1:pipeline} = new SequentialAgent({",
+      "  name: '${2:pipeline}',",
+      "  subAgents: [${3:agent1, agent2}],",
+      "  description: '${4:Sequential pipeline}',",
+      "});"
+    ],
+    "description": "ADK SequentialAgent (TypeScript)"
+  },
+  "ADK Parallel Agent (TypeScript)": {
+    "prefix": "adk-parallel",
+    "body": [
+      "import { ParallelAgent } from '@google/adk';",
+      "",
+      "export const ${1:parallel} = new ParallelAgent({",
+      "  name: '${2:parallel}',",
+      "  subAgents: [${3:agent1, agent2}],",
+      "  description: '${4:Parallel execution}',",
+      "});"
+    ],
+    "description": "ADK ParallelAgent (TypeScript)"
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "ADK Agent": {
+    "prefix": "adk-agent",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "",
+      "${1:agent_name} = LlmAgent(",
+      "    name='${2:my_agent}',",
+      "    model='${3:gemini-2.0-flash}',",
+      "    description='${4:Agent description}',",
+      "    instruction='${5:You are a helpful assistant.}',",
+      "    tools=[${6}],",
+      ")"
+    ],
+    "description": "ADK LlmAgent definition"
+  },
+  "ADK Root Agent": {
+    "prefix": "adk-root",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${1:my_agent}',",
+      "    model='${2:gemini-2.0-flash}',",
+      "    description='${3:Root agent}',",
+      "    instruction='${4:You are a helpful assistant.}',",
+      "    tools=[${5}],",
+      ")"
+    ],
+    "description": "ADK root_agent (required entry point)"
+  },
+  "ADK Tool (function)": {
+    "prefix": "adk-tool",
+    "body": [
+      "def ${1:tool_name}(${2:param}: ${3:str}) -> ${4:str}:",
+      "    \"\"\"${5:Tool description. Explain what this tool does and when to use it.}",
+      "",
+      "    Args:",
+      "        ${2}: ${6:Parameter description}",
+      "",
+      "    Returns:",
+      "        ${7:Return value description}",
+      "    \"\"\"",
+      "    ${0:return ''}"
+    ],
+    "description": "ADK tool function (docstring required for LLM)"
+  },
+  "ADK Before Model Callback": {
+    "prefix": "adk-before-model",
+    "body": [
+      "from google.adk.agents import LlmAgent, CallbackContext",
+      "from google.adk.models import LlmRequest",
+      "from typing import Optional",
+      "",
+      "def before_model_callback(",
+      "    callback_context: CallbackContext,",
+      "    llm_request: LlmRequest,",
+      ") -> Optional[LlmRequest]:",
+      "    \"\"\"${1:Modify the request before it is sent to the model.}\"\"\"",
+      "    ${0:return None  # Return None to proceed normally}"
+    ],
+    "description": "ADK before_model_callback"
+  },
+  "ADK After Model Callback": {
+    "prefix": "adk-after-model",
+    "body": [
+      "from google.adk.agents import CallbackContext",
+      "from google.adk.models import LlmResponse",
+      "from typing import Optional",
+      "",
+      "def after_model_callback(",
+      "    callback_context: CallbackContext,",
+      "    llm_response: LlmResponse,",
+      ") -> Optional[LlmResponse]:",
+      "    \"\"\"${1:Post-process the model response.}\"\"\"",
+      "    ${0:return None  # Return None to use original response}"
+    ],
+    "description": "ADK after_model_callback"
+  },
+  "ADK Before Tool Callback": {
+    "prefix": "adk-before-tool",
+    "body": [
+      "from google.adk.tools import BaseTool, ToolContext",
+      "from typing import Optional",
+      "",
+      "def before_tool_callback(",
+      "    tool: BaseTool,",
+      "    args: dict,",
+      "    tool_context: ToolContext,",
+      ") -> Optional[dict]:",
+      "    \"\"\"${1:Intercept tool calls — return a dict to skip actual execution.}\"\"\"",
+      "    ${0:return None  # Return None to proceed normally}"
+    ],
+    "description": "ADK before_tool_callback"
+  },
+  "ADK Sequential Agent": {
+    "prefix": "adk-sequential",
+    "body": [
+      "from google.adk.agents import SequentialAgent",
+      "",
+      "${1:pipeline} = SequentialAgent(",
+      "    name='${2:pipeline}',",
+      "    sub_agents=[${3:agent1, agent2}],",
+      "    description='${4:Sequential pipeline}',",
+      ")"
+    ],
+    "description": "ADK SequentialAgent"
+  },
+  "ADK Parallel Agent": {
+    "prefix": "adk-parallel",
+    "body": [
+      "from google.adk.agents import ParallelAgent",
+      "",
+      "${1:parallel} = ParallelAgent(",
+      "    name='${2:parallel}',",
+      "    sub_agents=[${3:agent1, agent2}],",
+      "    description='${4:Parallel execution}',",
+      ")"
+    ],
+    "description": "ADK ParallelAgent"
+  },
+  "ADK Loop Agent": {
+    "prefix": "adk-loop",
+    "body": [
+      "from google.adk.agents import LoopAgent",
+      "",
+      "${1:loop} = LoopAgent(",
+      "    name='${2:loop}',",
+      "    sub_agents=[${3:agent}],",
+      "    max_iterations=${4:5},",
+      "    description='${5:Looping agent}',",
+      ")"
+    ],
+    "description": "ADK LoopAgent"
+  },
+  "ADK Session State Access": {
+    "prefix": "adk-state",
+    "body": [
+      "# Read from session state",
+      "value = tool_context.state['${1:key}']",
+      "",
+      "# Write to session state",
+      "tool_context.state['${2:key}'] = ${3:value}"
+    ],
+    "description": "ADK session state read/write"
+  },
+  "ADK Full Agent File": {
+    "prefix": "adk-agent-file",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "",
+      "",
+      "def ${1:greet}(name: str) -> str:",
+      "    \"\"\"Greet a person by name.",
+      "",
+      "    Args:",
+      "        name: The person's name.",
+      "",
+      "    Returns:",
+      "        A greeting string.",
+      "    \"\"\"",
+      "    return f'Hello, {name}!'",
+      "",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${2:my_agent}',",
+      "    model='${3:gemini-2.0-flash}',",
+      "    description='${4:A helpful agent}',",
+      "    instruction='${5:You are a helpful assistant. Use tools when needed.}',",
+      "    tools=[${1:greet}],",
+      ")"
+    ],
+    "description": "ADK complete agent.py file template"
+  }
+}
