@@ -130,3 +130,11 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: npx @vscode/vsce publish --pat "$VSCE_PAT"
+
+      # ── Open VSX Registry ──────────────────────────────────────────────────
+      # Add an OVSX_TOKEN secret in repo Settings → Secrets to enable this step.
+      - name: Publish to Open VSX
+        if: steps.tag.outputs.skip == 'false' && env.OVSX_TOKEN != ''
+        env:
+          OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+        run: npx ovsx publish "*.vsix" -p "$OVSX_TOKEN"
