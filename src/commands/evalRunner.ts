@@ -75,7 +75,9 @@ export async function generateEvalCases(): Promise<void> {
 
   const env = detectEnv(project.root);
   const outFile = `${evalSetName.trim()}.evalset.json`;
-  const cmd = env.adkCmd(`eval_set generate_eval_cases ${outFile}`);
+  // CLI: adk eval_set generate_eval_cases AGENT_MODULE_FILE_PATH EVAL_SET_ID
+  const agentModule = path.relative(project.root, path.dirname(project.agentFile));
+  const cmd = env.adkCmd(`eval_set generate_eval_cases ${agentModule} ${outFile}`);
 
   log(`Generating eval cases: ${cmd}`);
   const terminal = vscode.window.createTerminal({ name: 'ADK: Generate Eval Cases', cwd: project.root });
