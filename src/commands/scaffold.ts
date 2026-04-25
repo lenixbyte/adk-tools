@@ -41,7 +41,7 @@ async function runInstallWizard(): Promise<boolean> {
   if (hasUv) {
     options.push({
       label: '$(package) Install with uv  (recommended)',
-      description: 'uv pip install google-adk',
+      description: 'uv tool install google-adk',
       detail: 'Fast — uv detected in your environment',
       value: 'uv',
     });
@@ -119,8 +119,9 @@ async function installWithProgress(
   method: 'uv' | 'pip' | 'pipenv',
   python: string | undefined
 ): Promise<boolean> {
+  // uv tool install puts adk on PATH as a global CLI tool (uv pip install does not)
   let cmd: string;
-  if (method === 'uv') cmd = 'uv pip install google-adk';
+  if (method === 'uv') cmd = 'uv tool install google-adk';
   else if (method === 'pipenv') cmd = 'pipenv install google-adk';
   else cmd = `${python ?? 'pip'} -m pip install google-adk`;
 
@@ -133,7 +134,7 @@ async function installWithProgress(
       cancellable: false,
     },
     async (progress) => {
-      progress.report({ message: 'Running pip install — this may take a minute' });
+      progress.report({ message: 'This may take a minute…' });
       try {
         const { stdout, stderr } = await execAsync(cmd, { timeout: 180_000 });
         log(`Install stdout: ${stdout}`);
@@ -141,18 +142,25 @@ async function installWithProgress(
 
         const nowAvailable = await isCommandAvailable('adk --version');
         if (nowAvailable) {
-          vscode.window.showInformationMessage('google-adk installed successfully!');
+          vscode.window.showInformationMessage('google-adk installed — ready to create your project!');
           return true;
         }
 
-        // Installed but not on PATH (common on Windows or restricted installs)
-        fallbackToTerminal(cmd);
+        // Exec succeeded but adk still not on PATH — PATH refresh needed.
+        // This is common after pip installs on Mac (~/Library/Python/x.x/bin not in VS Code PATH).
+        vscode.window.showInformationMessage(
+          'google-adk installed! Open a new terminal, run `adk --version` to confirm, then run "ADK: Create New Agent Project" again.',
+          'Try Again'
+        ).then((a) => {
+          if (a) vscode.commands.executeCommand('adk.createProject');
+        });
         return false;
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         log(`Install failed: ${msg}`);
+        // Exec itself threw — genuine failure, show terminal with error
         const action = await vscode.window.showErrorMessage(
-          'Install failed. Running in terminal so you can see the error.',
+          'Install command failed — opening terminal so you can see the error.',
           'Show Terminal', 'Open Docs'
         );
         if (action === 'Show Terminal') fallbackToTerminal(cmd);
