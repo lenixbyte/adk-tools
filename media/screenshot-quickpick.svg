@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="340">
+  <defs>
+    <filter id="qp-shadow" x="-5%" y="-6%" width="110%" height="116%">
+      <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <clipPath id="qp-clip">
+      <rect width="620" height="340" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#qp-shadow)">
+    <rect x="8" y="8" width="604" height="324" rx="10" fill="#1e1e1e"/>
+  </g>
+
+  <g clip-path="url(#qp-clip)" transform="translate(8,8)">
+    <!-- Background -->
+    <rect width="604" height="324" fill="#1e1e1e"/>
+
+    <!-- Blurred editor background (behind quickpick) -->
+    <rect width="604" height="324" fill="#1e1e1e"/>
+    <!-- Fake editor lines for context -->
+    <text x="20" y="30" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12">from google.adk.agents import LlmAgent</text>
+    <text x="20" y="50" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12"></text>
+    <text x="20" y="70" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12">root_agent = LlmAgent(</text>
+    <text x="20" y="90" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12">    name='my_agent',</text>
+    <text x="20" y="110" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12">    model='gemini-2.0-flash',</text>
+    <text x="20" y="130" fill="#3d3d3d" font-family="'SF Mono',Menlo,monospace" font-size="12">    instruction='You are a helpful assistant.',</text>
+
+    <!-- QuickPick overlay -->
+    <rect x="102" y="24" width="400" height="272" rx="6" fill="#3c3c3c"/>
+    <rect x="102" y="24" width="400" height="272" rx="6" fill="none" stroke="#454545" stroke-width="1"/>
+
+    <!-- Title -->
+    <text x="122" y="45" fill="#b0b0b0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">Switch Model (current: gemini-2.0-flash)</text>
+
+    <!-- Search input -->
+    <rect x="112" y="52" width="380" height="30" rx="4" fill="#3c3c3c" stroke="#007fd4" stroke-width="1.5"/>
+    <text x="126" y="72" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Select a model</text>
+    <!-- Cursor blink -->
+    <line x1="217" y1="58" x2="217" y2="76" stroke="#aeafad" stroke-width="1.5"/>
+
+    <!-- Separator -->
+    <line x1="112" y1="86" x2="492" y2="86" stroke="#454545" stroke-width="0.5"/>
+
+    <!-- Item 1 — gemini-2.5-pro -->
+    <rect x="112" y="87" width="380" height="36" fill="#3c3c3c"/>
+    <text x="128" y="108" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">gemini-2.5-pro</text>
+    <text x="320" y="108" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">Most capable</text>
+
+    <!-- Item 2 — gemini-2.0-flash (SELECTED / current) -->
+    <rect x="112" y="123" width="380" height="36" rx="4" fill="#04395e"/>
+    <!-- Checkmark -->
+    <text x="115" y="145" fill="#007acc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">›</text>
+    <text x="128" y="145" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500">gemini-2.0-flash</text>
+    <text x="290" y="145" fill="#7cb4e0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">Fast + capable — recommended default  ← current</text>
+
+    <!-- Item 3 — gemini-2.0-flash-lite -->
+    <rect x="112" y="159" width="380" height="36" fill="#3c3c3c"/>
+    <text x="128" y="181" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">gemini-2.0-flash-lite</text>
+    <text x="305" y="181" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">Fastest, lowest cost</text>
+
+    <!-- Item 4 — gemini-1.5-pro -->
+    <rect x="112" y="195" width="380" height="36" fill="#3c3c3c"/>
+    <text x="128" y="217" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">gemini-1.5-pro</text>
+    <text x="285" y="217" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">Previous generation Pro</text>
+
+    <!-- Item 5 — claude-3-5-sonnet -->
+    <rect x="112" y="231" width="380" height="36" fill="#3c3c3c"/>
+    <text x="128" y="253" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">claude-3-5-sonnet@20241022</text>
+    <text x="348" y="253" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">Anthropic via Vertex AI</text>
+
+    <!-- Rounded bottom of QuickPick -->
+    <rect x="112" y="267" width="380" height="29" rx="6" fill="#3c3c3c"/>
+    <rect x="112" y="267" width="380" height="10" fill="#3c3c3c"/>
+    <line x1="112" y1="267" x2="492" y2="267" stroke="#454545" stroke-width="0.5"/>
+    <text x="302" y="284" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" text-anchor="middle">↑↓ to navigate  ↵ to confirm  esc to cancel</text>
+
+    <!-- Status bar -->
+    <rect y="302" width="604" height="22" fill="#007acc"/>
+    <text x="10" y="317" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">⚡ ADK · uv</text>
+    <text x="100" y="317" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">▶ Web</text>
+    <text x="148" y="317" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">⊙ API</text>
+  </g>
+</svg>

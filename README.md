@@ -19,6 +19,42 @@ A VS Code, Cursor, and Windsurf extension that brings the full [Google Agent Dev
 
 ---
 
+## Preview
+
+<div align="center">
+
+<img src="media/screenshot-running.png" width="720" alt="ADK Tools — server running with syntax-highlighted agent.py and live status bar"/>
+
+*Web UI running on :8000 · live status bar · syntax-highlighted agent.py*
+
+</div>
+
+<br/>
+
+<div align="center">
+<img src="media/screenshot-sidebar.png" width="340" alt="ADK sidebar tree view"/>
+&nbsp;&nbsp;&nbsp;
+<img src="media/screenshot-quickpick.png" width="520" alt="Model switcher QuickPick"/>
+</div>
+
+<div align="center">
+
+*Sidebar with project info, running state, and sections · Model switcher with current model highlighted*
+
+</div>
+
+<br/>
+
+<div align="center">
+
+<img src="media/screenshot-install.png" width="580" alt="ADK install wizard"/>
+
+*Auto-detects uv / pip / pipenv and installs google-adk in one click*
+
+</div>
+
+---
+
 ## What it does
 
 | | |
