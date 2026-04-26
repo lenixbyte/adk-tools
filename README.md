@@ -8,7 +8,7 @@
 
 Scaffold · Run · Debug · Visualize · Eval · Deploy — all from the editor.
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/lenixbyte.adk-tools?label=Marketplace&color=007acc)](https://marketplace.visualstudio.com/items?itemName=lenixbyte.adk-tools)
+[![VS Code Marketplace](https://vsmarketplacebadges.dev/version-short/lenixbyte.adk-tools.svg?label=Marketplace&colorA=007acc&colorB=007acc)](https://marketplace.visualstudio.com/items?itemName=lenixbyte.adk-tools)
 [![Open VSX](https://img.shields.io/open-vsx/v/lenixbyte/adk-tools?label=Open%20VSX&color=purple)](https://open-vsx.org/extension/lenixbyte/adk-tools)
 [![Downloads](https://img.shields.io/open-vsx/dt/lenixbyte/adk-tools?color=6a5acd&label=downloads)](https://open-vsx.org/extension/lenixbyte/adk-tools)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
