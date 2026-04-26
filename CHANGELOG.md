@@ -1,3 +1,12 @@
+## v1.0.9 — 2026-04-26
+
+### Features
+- v1.0.9 — Agent Graph, Debug Agent, @adk chat, Eval History, expanded scaffold & snippets
+
+### Bug Fixes
+- replace retired shields.io Marketplace badge with vsmarketplacebadges.dev
+
+
 # Changelog
 
 ## v1.0.9 — 2026-04-27
