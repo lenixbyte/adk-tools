@@ -22,17 +22,17 @@ Scaffold · Run · Debug · Visualize · Eval · Deploy — all from the editor.
 <table border="0" cellspacing="0" cellpadding="10">
 <tr>
 <td align="center" valign="top">
-<img src="media/screenshot-sidebar.svg" width="270" alt="ADK Tools sidebar"/><br/>
+<img src="media/screenshot-sidebar.png" width="270" alt="ADK Tools sidebar"/><br/>
 <sub><b>Sidebar</b> — every feature one click away</sub>
 </td>
 <td align="center" valign="top">
-<img src="media/screenshot-running.svg" width="490" alt="Editor with running ADK server"/><br/>
+<img src="media/screenshot-running.png" width="490" alt="Editor with running ADK server"/><br/>
 <sub><b>Editor</b> — live server, hot reload, status bar</sub>
 </td>
 </tr>
 <tr>
 <td colspan="2" align="center"><br/>
-<img src="media/screenshot-agent-graph.svg" width="740" alt="Agent Graph webview"/><br/>
+<img src="media/screenshot-agent-graph.png" width="740" alt="Agent Graph webview"/><br/>
 <sub><b>Agent Graph</b> — interactive hierarchy with click-to-source navigation</sub>
 </td>
 </tr>
