@@ -1,48 +1,85 @@
 {
-  "ADK Agent (TypeScript)": {
+  "ADK LlmAgent": {
     "prefix": "adk-agent",
     "body": [
-      "import { LlmAgent } from '@google/adk';",
+      "import { LlmAgent } from '@google/adk/agents';",
       "",
       "export const ${1:agentName} = new LlmAgent({",
       "  name: '${2:my_agent}',",
-      "  model: '${3:gemini-2.0-flash}',",
-      "  description: '${4:Agent description}',",
+      "  model: '${3:gemini-2.5-flash}',",
+      "  description: '${4:What this agent does and when to use it.}',",
       "  instruction: '${5:You are a helpful assistant.}',",
       "  tools: [${6}],",
       "});"
     ],
     "description": "ADK LlmAgent (TypeScript)"
   },
-  "ADK Root Agent (TypeScript)": {
+
+  "ADK Root Agent": {
     "prefix": "adk-root",
     "body": [
-      "import { LlmAgent } from '@google/adk';",
+      "import { LlmAgent } from '@google/adk/agents';",
       "",
       "export const rootAgent = new LlmAgent({",
       "  name: '${1:my_agent}',",
-      "  model: '${2:gemini-2.0-flash}',",
-      "  description: '${3:Root agent}',",
+      "  model: '${2:gemini-2.5-flash}',",
+      "  description: '${3:Root agent — entry point for this ADK app.}',",
       "  instruction: '${4:You are a helpful assistant.}',",
       "  tools: [${5}],",
       "});"
     ],
-    "description": "ADK root agent entry point (TypeScript)"
+    "description": "ADK rootAgent — required entry point export (TypeScript)"
   },
-  "ADK Tool (TypeScript)": {
-    "prefix": "adk-tool",
+
+  "ADK Complete Agent File": {
+    "prefix": "adk-agent-file",
     "body": [
-      "import { FunctionTool } from '@google/adk';",
+      "import { LlmAgent } from '@google/adk/agents';",
+      "import { FunctionTool } from '@google/adk/tools';",
       "",
-      "export const ${1:toolName} = new FunctionTool({",
-      "  name: '${2:tool_name}',",
-      "  description: '${3:What this tool does and when to use it.}',",
+      "const ${1:myTool} = new FunctionTool({",
+      "  name: '${2:my_tool}',",
+      "  description: '${3:What this tool does. Be specific — the LLM reads this.}',",
       "  parameters: {",
-      "    type: 'object',",
+      "    type: 'object' as const,",
       "    properties: {",
       "      ${4:param}: {",
       "        type: 'string',",
-      "        description: '${5:Parameter description}',",
+      "        description: '${5:What this parameter is.}',",
+      "      },",
+      "    },",
+      "    required: ['${4:param}'],",
+      "  },",
+      "  execute: async ({ ${4:param} }: { ${4:param}: string }) => {",
+      "    return { result: ${6:''} };",
+      "  },",
+      "});",
+      "",
+      "export const rootAgent = new LlmAgent({",
+      "  name: '${7:my_agent}',",
+      "  model: '${8:gemini-2.5-flash}',",
+      "  description: '${9:A helpful agent.}',",
+      "  instruction: '${10:You are a helpful assistant. Use tools when needed.}',",
+      "  tools: [${1:myTool}],",
+      "});"
+    ],
+    "description": "Complete agent.ts file — LlmAgent with one FunctionTool (TypeScript)"
+  },
+
+  "ADK FunctionTool": {
+    "prefix": "adk-tool",
+    "body": [
+      "import { FunctionTool } from '@google/adk/tools';",
+      "",
+      "export const ${1:toolName} = new FunctionTool({",
+      "  name: '${2:tool_name}',",
+      "  description: '${3:What this tool does. Be specific — the LLM reads this.}',",
+      "  parameters: {",
+      "    type: 'object' as const,",
+      "    properties: {",
+      "      ${4:param}: {",
+      "        type: 'string',",
+      "        description: '${5:What this parameter is.}',",
       "      },",
       "    },",
       "    required: ['${4:param}'],",
@@ -54,30 +91,114 @@
     ],
     "description": "ADK FunctionTool (TypeScript)"
   },
-  "ADK Sequential Agent (TypeScript)": {
+
+  "ADK SequentialAgent": {
     "prefix": "adk-sequential",
     "body": [
-      "import { SequentialAgent } from '@google/adk';",
+      "import { SequentialAgent } from '@google/adk/agents';",
       "",
       "export const ${1:pipeline} = new SequentialAgent({",
       "  name: '${2:pipeline}',",
-      "  subAgents: [${3:agent1, agent2}],",
-      "  description: '${4:Sequential pipeline}',",
+      "  description: '${3:Runs sub-agents in sequence, passing state between them.}',",
+      "  subAgents: [${4:step1, step2}],",
       "});"
     ],
     "description": "ADK SequentialAgent (TypeScript)"
   },
-  "ADK Parallel Agent (TypeScript)": {
+
+  "ADK ParallelAgent": {
     "prefix": "adk-parallel",
     "body": [
-      "import { ParallelAgent } from '@google/adk';",
+      "import { ParallelAgent } from '@google/adk/agents';",
       "",
       "export const ${1:parallel} = new ParallelAgent({",
       "  name: '${2:parallel}',",
-      "  subAgents: [${3:agent1, agent2}],",
-      "  description: '${4:Parallel execution}',",
+      "  description: '${3:Runs sub-agents concurrently and merges results.}',",
+      "  subAgents: [${4:agent1, agent2}],",
       "});"
     ],
     "description": "ADK ParallelAgent (TypeScript)"
+  },
+
+  "ADK LoopAgent": {
+    "prefix": "adk-loop",
+    "body": [
+      "import { LoopAgent } from '@google/adk/agents';",
+      "",
+      "export const ${1:loop} = new LoopAgent({",
+      "  name: '${2:loop}',",
+      "  description: '${3:Repeats the sub-agent until a condition is met.}',",
+      "  subAgents: [${4:agent}],",
+      "  maxIterations: ${5:5},",
+      "});"
+    ],
+    "description": "ADK LoopAgent (TypeScript)"
+  },
+
+  "ADK Session State": {
+    "prefix": "adk-state",
+    "body": [
+      "// Session-scoped (cleared when session ends)",
+      "toolContext.state.set('${1:key}', ${2:value});",
+      "const value = toolContext.state.get('${1:key}');",
+      "",
+      "// User-scoped (persists across sessions for this user)",
+      "toolContext.state.set('user:${3:key}', ${4:value});",
+      "",
+      "// App-scoped (global across all users and sessions)",
+      "toolContext.state.set('app:${5:key}', ${6:value});"
+    ],
+    "description": "ADK session state — session, user, and app scoped variants (TypeScript)"
+  },
+
+  "ADK Before Model Callback": {
+    "prefix": "adk-before-model",
+    "body": [
+      "import type { CallbackContext, LlmRequest } from '@google/adk';",
+      "",
+      "function beforeModelCallback(",
+      "  callbackContext: CallbackContext,",
+      "  llmRequest: LlmRequest,",
+      "): LlmRequest | undefined {",
+      "  // Return undefined to proceed normally.",
+      "  // Return a modified LlmRequest to change what gets sent to the model.",
+      "  ${0:return undefined;}",
+      "}"
+    ],
+    "description": "ADK beforeModelCallback (TypeScript)"
+  },
+
+  "ADK After Model Callback": {
+    "prefix": "adk-after-model",
+    "body": [
+      "import type { CallbackContext, LlmResponse } from '@google/adk';",
+      "",
+      "function afterModelCallback(",
+      "  callbackContext: CallbackContext,",
+      "  llmResponse: LlmResponse,",
+      "): LlmResponse | undefined {",
+      "  // Return undefined to use the original response unchanged.",
+      "  ${0:return undefined;}",
+      "}"
+    ],
+    "description": "ADK afterModelCallback (TypeScript)"
+  },
+
+  "ADK Before Tool Callback": {
+    "prefix": "adk-before-tool",
+    "body": [
+      "import type { BaseTool, ToolContext } from '@google/adk';",
+      "",
+      "function beforeToolCallback(",
+      "  tool: BaseTool,",
+      "  args: Record<string, unknown>,",
+      "  toolContext: ToolContext,",
+      "): Record<string, unknown> | undefined {",
+      "  // Return undefined to proceed normally.",
+      "  // Return a Record to skip execution and use it as the tool result.",
+      "  ${0:return undefined;}",
+      "}"
+    ],
+    "description": "ADK beforeToolCallback (TypeScript)"
   }
 }

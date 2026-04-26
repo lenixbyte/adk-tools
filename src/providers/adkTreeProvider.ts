@@ -182,6 +182,16 @@ export class AdkTreeProvider implements vscode.TreeDataProvider<AdkTreeItem> {
         icon: new vscode.ThemeIcon('settings-gear'),
         tooltip: 'Configure port, hot reload, log level, session storage',
       }),
+      new AdkTreeItem('Agent Graph', vscode.TreeItemCollapsibleState.None, {
+        command: { command: 'adk.agentGraph', title: 'Agent Graph' },
+        icon: new vscode.ThemeIcon('type-hierarchy'),
+        tooltip: 'Visualize the agent hierarchy as an interactive graph',
+      }),
+      new AdkTreeItem('Debug Agent', vscode.TreeItemCollapsibleState.None, {
+        command: { command: 'adk.debugAgent', title: 'Debug Agent' },
+        icon: new vscode.ThemeIcon('debug-alt'),
+        tooltip: 'Generate .vscode/launch.json for debugging with breakpoints',
+      }),
     ];
   }
 
@@ -216,6 +226,11 @@ export class AdkTreeProvider implements vscode.TreeDataProvider<AdkTreeItem> {
         command: { command: 'adk.createEvalFile', title: 'Generate Eval Cases' },
         icon: new vscode.ThemeIcon('add'),
         tooltip: 'Generate eval test cases with adk eval_set',
+      }),
+      new AdkTreeItem('Eval History', vscode.TreeItemCollapsibleState.None, {
+        command: { command: 'adk.evalHistory', title: 'Eval History' },
+        icon: new vscode.ThemeIcon('history'),
+        tooltip: 'View eval pass rates over time',
       }),
     ];
   }

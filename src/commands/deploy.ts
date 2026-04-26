@@ -156,5 +156,5 @@ async function inputRequired(title: string, prompt: string, placeholder: string)
 function run(cmd: string, name: string, cwd: string): void {
   const terminal = vscode.window.createTerminal({ name, cwd });
   terminal.show();
-  terminal.sendText(cmd);
+  setTimeout(() => terminal.sendText(cmd), 300);
 }

@@ -433,6 +433,215 @@ function promoteEnvToRoot(agentDir: string, rootDir: string): void {
   }
 }
 
+// ─── Agent Templates ──────────────────────────────────────────────────────────
+
+type AgentType = 'single' | 'multi' | 'mcp' | 'a2a';
+
+function buildEnvContent(
+  backend: 'google_ai' | 'vertex_ai' | 'skip',
+  apiKey?: string,
+  gcpProject?: string,
+  gcpRegion?: string
+): string {
+  if (backend === 'google_ai') {
+    return `GOOGLE_API_KEY=${apiKey ?? 'YOUR_API_KEY_HERE'}\n`;
+  }
+  if (backend === 'vertex_ai') {
+    return `GOOGLE_GENAI_USE_VERTEXAI=true\nGOOGLE_CLOUD_PROJECT=${gcpProject ?? ''}\nGOOGLE_CLOUD_LOCATION=${gcpRegion ?? 'us-central1'}\n`;
+  }
+  return `# Configure your auth:\n# GOOGLE_API_KEY=your_key_here\n# or for Vertex AI:\n# GOOGLE_GENAI_USE_VERTEXAI=true\n# GOOGLE_CLOUD_PROJECT=your-project\n# GOOGLE_CLOUD_LOCATION=us-central1\n`;
+}
+
+function writeSingleAgent(agentDir: string, name: string, model: string): string {
+  const agentPy = `from google.adk.agents import LlmAgent
+
+
+def sample_tool(query: str) -> str:
+    """Answer a user query.
+
+    Args:
+        query: The user's question.
+
+    Returns:
+        The answer as a string.
+    """
+    return f"You asked: {query}"
+
+
+root_agent = LlmAgent(
+    name='${name}',
+    model='${model}',
+    description='A helpful assistant.',
+    instruction='You are a helpful assistant. Use the available tools to answer questions.',
+    tools=[sample_tool],
+)
+`;
+  fs.writeFileSync(path.join(agentDir, 'agent.py'), agentPy, 'utf-8');
+  return path.join(agentDir, 'agent.py');
+}
+
+function writeMultiAgent(agentDir: string, name: string, model: string): string {
+  const agentPy = `from google.adk.agents import SequentialAgent
+from .agents.researcher import researcher_agent
+from .agents.responder import responder_agent
+
+root_agent = SequentialAgent(
+    name='${name}',
+    description='A multi-agent pipeline: researcher gathers information, responder formulates the reply.',
+    sub_agents=[researcher_agent, responder_agent],
+)
+`;
+  fs.writeFileSync(path.join(agentDir, 'agent.py'), agentPy, 'utf-8');
+
+  const agentsDir = path.join(agentDir, 'agents');
+  fs.mkdirSync(agentsDir, { recursive: true });
+  fs.writeFileSync(path.join(agentsDir, '__init__.py'), '', 'utf-8');
+
+  const researcherPy = `from google.adk.agents import LlmAgent
+
+researcher_agent = LlmAgent(
+    name='researcher',
+    model='${model}',
+    description='Researches the topic and stores findings in session state.',
+    instruction=(
+        'Analyze the user request thoroughly. '
+        'Store key findings in state["research_results"] for the next agent to use.'
+    ),
+    output_key='research_results',
+)
+`;
+  fs.writeFileSync(path.join(agentsDir, 'researcher.py'), researcherPy, 'utf-8');
+
+  const responderPy = `from google.adk.agents import LlmAgent
+
+responder_agent = LlmAgent(
+    name='responder',
+    model='${model}',
+    description='Formulates the final response using research findings from state.',
+    instruction=(
+        'Read state["research_results"] and use those findings to write '
+        'a clear, concise response for the user.'
+    ),
+)
+`;
+  fs.writeFileSync(path.join(agentsDir, 'responder.py'), responderPy, 'utf-8');
+
+  return path.join(agentDir, 'agent.py');
+}
+
+function writeMcpAgent(agentDir: string, name: string, model: string): string {
+  const agentPy = `from google.adk.agents import LlmAgent
+from google.adk.tools import MCPToolset
+from mcp import StdioServerParameters
+
+# Replace the MCPToolset connection_params with your MCP server of choice.
+# Example below uses the filesystem MCP server.
+# See: https://github.com/modelcontextprotocol/servers
+root_agent = LlmAgent(
+    name='${name}',
+    model='${model}',
+    description='An agent with MCP tool integration.',
+    instruction='Use the available MCP tools to help the user accomplish tasks.',
+    tools=[
+        MCPToolset(
+            connection_params=StdioServerParameters(
+                command='npx',
+                args=['-y', '@modelcontextprotocol/server-filesystem', '.'],
+            ),
+        ),
+    ],
+)
+`;
+  fs.writeFileSync(path.join(agentDir, 'agent.py'), agentPy, 'utf-8');
+  return path.join(agentDir, 'agent.py');
+}
+
+function writeA2aAgent(agentDir: string, name: string, model: string): string {
+  const agentPy = `from google.adk.agents import LlmAgent
+
+# This agent is designed to be called by other agents via the A2A protocol.
+# Run with: adk api_server --port 8001 .
+# Other agents connect using: AgentTool(agent=...) or A2A HTTP client.
+#
+# Keep the description precise — it is published in the A2A agent card
+# and used by orchestrating agents to decide when to call this agent.
+root_agent = LlmAgent(
+    name='${name}',
+    model='${model}',
+    description=(
+        'Specialist agent for ${name}. '
+        'Accepts a plain-text task description and returns a structured result.'
+    ),
+    instruction=(
+        'You are a specialist agent. '
+        'Complete the task described by the caller and return a clear, structured result. '
+        'Be concise — your output will be consumed by another agent, not a human directly.'
+    ),
+    tools=[],
+)
+`;
+  fs.writeFileSync(path.join(agentDir, 'agent.py'), agentPy, 'utf-8');
+  return path.join(agentDir, 'agent.py');
+}
+
+function scaffoldFiles(
+  agentType: AgentType,
+  outputDir: string,
+  name: string,
+  model: string,
+  backend: 'google_ai' | 'vertex_ai' | 'skip',
+  apiKey?: string,
+  gcpProject?: string,
+  gcpRegion?: string
+): string {
+  const agentDir = path.join(outputDir, name);
+  fs.mkdirSync(agentDir, { recursive: true });
+
+  // Write __init__.py
+  fs.writeFileSync(
+    path.join(agentDir, '__init__.py'),
+    `from .agent import root_agent\n\n__all__ = ['root_agent']\n`,
+    'utf-8'
+  );
+
+  // Write agent.py based on type
+  let agentFile: string;
+  if (agentType === 'single') {
+    agentFile = writeSingleAgent(agentDir, name, model);
+  } else if (agentType === 'multi') {
+    agentFile = writeMultiAgent(agentDir, name, model);
+  } else if (agentType === 'mcp') {
+    agentFile = writeMcpAgent(agentDir, name, model);
+  } else {
+    agentFile = writeA2aAgent(agentDir, name, model);
+  }
+
+  // Write .env in outputDir (not agentDir)
+  const envPath = path.join(outputDir, '.env');
+  if (!fs.existsSync(envPath)) {
+    fs.writeFileSync(envPath, buildEnvContent(backend, apiKey, gcpProject, gcpRegion), 'utf-8');
+  }
+
+  // Write .gitignore in outputDir
+  const gitignorePath = path.join(outputDir, '.gitignore');
+  if (!fs.existsSync(gitignorePath)) {
+    fs.writeFileSync(gitignorePath, '.env\n__pycache__/\n*.pyc\n.venv/\n', 'utf-8');
+  } else {
+    const gi = fs.readFileSync(gitignorePath, 'utf-8');
+    if (!gi.split('\n').some((l) => l.trim() === '.env')) {
+      fs.appendFileSync(gitignorePath, gi.endsWith('\n') ? '.env\n' : '\n.env\n');
+    }
+  }
+
+  // Create .adk directory marker in outputDir
+  const adkDir = path.join(outputDir, '.adk');
+  if (!fs.existsSync(adkDir)) {
+    fs.mkdirSync(adkDir, { recursive: true });
+  }
+
+  return agentFile;
+}
+
 // ─── Create Wizard ────────────────────────────────────────────────────────────
 
 const GCP_REGIONS = [
@@ -451,9 +660,47 @@ async function runCreateWizard(tree: AdkTreeProvider): Promise<void> {
   const hasWorkspace = (vscode.workspace.workspaceFolders?.length ?? 0) > 0;
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 
-  // 1/4 — Name
+  // 0/5 — Agent type
+  const agentTypePick = await vscode.window.showQuickPick(
+    [
+      {
+        label: '$(person) Single Agent',
+        description: 'one LlmAgent with custom tools',
+        detail: 'Best for most use cases — a single agent with function tools',
+        value: 'single' as AgentType,
+      },
+      {
+        label: '$(type-hierarchy) Multi-Agent Pipeline',
+        description: 'SequentialAgent orchestrating sub-agents',
+        detail: 'Researcher + Responder pattern — good for complex workflows',
+        value: 'multi' as AgentType,
+      },
+      {
+        label: '$(plug) Agent with MCP Tools',
+        description: 'LlmAgent connected to MCP servers',
+        detail: 'Integrates any Model Context Protocol server (filesystem, databases, APIs)',
+        value: 'mcp' as AgentType,
+      },
+      {
+        label: '$(link) A2A Agent',
+        description: 'agent exposed as an A2A service for other agents to call',
+        detail: 'Specialist agent callable by orchestrators via the A2A protocol',
+        value: 'a2a' as AgentType,
+      },
+    ],
+    {
+      title: 'New ADK Agent — 1/5: Agent Type',
+      placeHolder: 'What kind of agent are you building?',
+      matchOnDescription: true,
+      matchOnDetail: true,
+    }
+  );
+  if (!agentTypePick) return;
+  const agentType = agentTypePick.value;
+
+  // 1/5 — Name
   const name = await vscode.window.showInputBox({
-    title: 'New ADK Agent — 1/4: Name',
+    title: 'New ADK Agent — 2/5: Name',
     prompt: 'Agent name (lowercase letters, numbers, underscores)',
     placeHolder: 'my_agent',
     validateInput: (v) => {
@@ -464,7 +711,7 @@ async function runCreateWizard(tree: AdkTreeProvider): Promise<void> {
   });
   if (!name) return;
 
-  // 2/4 — Backend / Auth  (before model so we can show the right model list)
+  // 2/5 — Backend / Auth  (before model so we can show the right model list)
   type Backend = 'google_ai' | 'vertex_ai' | 'skip';
   const backendPick = await vscode.window.showQuickPick(
     [
@@ -484,7 +731,7 @@ async function runCreateWizard(tree: AdkTreeProvider): Promise<void> {
         value: 'skip' as Backend,
       },
     ],
-    { title: 'New ADK Agent — 2/4: Backend', placeHolder: 'How will this agent authenticate?' }
+    { title: 'New ADK Agent — 3/5: Backend', placeHolder: 'How will this agent authenticate?' }
   );
   if (!backendPick) return;
 
@@ -537,15 +784,15 @@ async function runCreateWizard(tree: AdkTreeProvider): Promise<void> {
       : fetchGoogleAiModels(apiKey);
 
   const model = await vscode.window.showQuickPick(modelItems, {
-    title: 'New ADK Agent — 3/4: Model',
+    title: 'New ADK Agent — 4/5: Model',
     placeHolder: backendPick.value === 'google_ai' ? 'Loading available models…' : 'Select model',
     matchOnDescription: true,
   });
   if (!model) return;
 
-  // 4/4 — Parent folder (default to workspace root when already in a project)
+  // 4/5 — Parent folder (default to workspace root when already in a project)
   const folderUri = await vscode.window.showOpenDialog({
-    title: 'New ADK Agent — 4/4: Parent Folder',
+    title: 'New ADK Agent — 5/5: Parent Folder',
     defaultUri: workspaceRoot ? vscode.Uri.file(workspaceRoot) : undefined,
     canSelectFiles: false,
     canSelectFolders: true,
@@ -555,49 +802,47 @@ async function runCreateWizard(tree: AdkTreeProvider): Promise<void> {
   if (!folderUri || folderUri.length === 0) return;
   const outputDir = folderUri[0].fsPath;
 
-  // Build fully non-interactive command
-  const args: string[] = [`create`, name.trim(), `--model`, model.label];
-  if (apiKey)     { args.push('--api_key', apiKey); }
-  if (gcpProject) { args.push('--project', gcpProject); }
-  if (gcpRegion)  { args.push('--region', gcpRegion); }
-  const cmd = `adk ${args.join(' ')}`;
-  const projectPath = path.join(outputDir, name.trim());
+  const trimmedName = name.trim();
+  log(`Scaffolding ${agentType} agent "${trimmedName}" in ${outputDir}`);
 
-  log(`Scaffolding: ${cmd} (in ${outputDir})`);
+  try {
+    const agentFile = scaffoldFiles(
+      agentType,
+      outputDir,
+      trimmedName,
+      model.label,
+      backendPick.value,
+      apiKey,
+      gcpProject,
+      gcpRegion
+    );
 
-  await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: `Creating agent "${name.trim()}"…`, cancellable: false },
-    async () => {
-      try {
-        const { stdout, stderr } = await execAsync(cmd, { cwd: outputDir, timeout: 60_000 });
-        if (stdout) log(stdout);
-        if (stderr) log(stderr);
+    tree.refresh();
 
-        // Promote .env from agent subfolder → parent (root) folder so that
-        // `adk web` running from the parent picks it up naturally.
-        promoteEnvToRoot(projectPath, outputDir);
+    // Open agent.py in the editor
+    const doc = await vscode.workspace.openTextDocument(agentFile);
+    await vscode.window.showTextDocument(doc);
 
-        tree.refresh();
+    const typeLabel: Record<AgentType, string> = {
+      single: 'Single Agent',
+      multi: 'Multi-Agent Pipeline',
+      mcp: 'MCP Agent',
+      a2a: 'A2A Agent',
+    };
 
-        if (hasWorkspace) {
-          // Already in a project — agent folder is now visible in explorer
-          vscode.window.showInformationMessage(`Agent "${name.trim()}" created.`);
-        } else {
-          // No workspace open — open the selected parent folder (contains the new agent)
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), false);
-        }
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        log(`adk create failed: ${msg}`);
-        const action = await vscode.window.showErrorMessage(
-          `adk create failed. Check the output log for details.`,
-          'Show Output', 'Open Docs'
-        );
-        if (action === 'Show Output') showOutput();
-        else if (action === 'Open Docs') {
-          vscode.env.openExternal(vscode.Uri.parse('https://adk.dev/get-started/installation/'));
-        }
-      }
+    if (hasWorkspace) {
+      vscode.window.showInformationMessage(
+        `${typeLabel[agentType]} "${trimmedName}" created — open the ADK panel to run it.`
+      );
+    } else {
+      vscode.window.showInformationMessage(
+        `${typeLabel[agentType]} "${trimmedName}" created. Opening folder…`
+      );
+      vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(outputDir), false);
     }
-  );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    log(`Scaffold failed: ${msg}`);
+    vscode.window.showErrorMessage(`Failed to create agent: ${msg}`);
+  }
 }

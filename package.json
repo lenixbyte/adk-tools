@@ -2,7 +2,7 @@
   "name": "adk-tools",
   "displayName": "ADK Tools",
   "description": "Google Agent Development Kit — scaffold, run, deploy, and eval ADK agents from VS Code",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "publisher": "lenixbyte",
   "engines": {
     "vscode": "^1.85.0"
@@ -164,6 +164,24 @@
         "title": "Open ADK Documentation",
         "category": "ADK",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "adk.agentGraph",
+        "title": "Agent Graph",
+        "category": "ADK",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "adk.debugAgent",
+        "title": "Debug Agent",
+        "category": "ADK",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "adk.evalHistory",
+        "title": "Eval History",
+        "category": "ADK",
+        "icon": "$(history)"
       }
     ],
     "viewsContainers": {
@@ -220,6 +238,14 @@
         }
       ]
     },
+    "chatParticipants": [
+      {
+        "id": "adk",
+        "name": "adk",
+        "description": "ADK expert — ask about your agents, tools, multi-agent design, and deployment",
+        "isSticky": true
+      }
+    ],
     "snippets": [
       {
         "language": "python",
@@ -228,6 +254,10 @@
       {
         "language": "typescript",
         "path": "./snippets/typescript.json"
+      },
+      {
+        "language": "dotenv",
+        "path": "./snippets/python.json"
       }
     ]
   },

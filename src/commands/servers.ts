@@ -58,9 +58,14 @@ export async function runWeb(statusBar: StatusBarManager, tree: AdkTreeProvider)
   const cmd = env.adkCmd(`web${flags}`);
 
   log(`Starting Web UI: ${cmd} (cwd: ${project.webRoot})`);
-  webTerminal = vscode.window.createTerminal({ name: 'ADK Web UI', cwd: project.webRoot });
+  const webShell = process.env.SHELL ?? '/bin/zsh';
+  webTerminal = vscode.window.createTerminal({
+    name: 'ADK Web UI',
+    cwd: project.webRoot,
+    shellPath: webShell,
+    shellArgs: ['-c', cmd],
+  });
   webTerminal.show();
-  webTerminal.sendText(cmd);
 
   statusBar.setWebRunning(true, settings.port);
   statusBar.setHotReload(settings.hotReload);
@@ -100,9 +105,14 @@ export async function runApiServer(statusBar: StatusBarManager, tree: AdkTreePro
   const cmd = env.adkCmd(`api_server${flags}`);
 
   log(`Starting API Server: ${cmd} (cwd: ${project.webRoot})`);
-  apiTerminal = vscode.window.createTerminal({ name: 'ADK API Server', cwd: project.webRoot });
+  const apiShell = process.env.SHELL ?? '/bin/zsh';
+  apiTerminal = vscode.window.createTerminal({
+    name: 'ADK API Server',
+    cwd: project.webRoot,
+    shellPath: apiShell,
+    shellArgs: ['-c', cmd],
+  });
   apiTerminal.show();
-  apiTerminal.sendText(cmd);
 
   statusBar.setApiRunning(true, settings.port);
   statusBar.setHotReload(settings.hotReload);

@@ -1,19 +1,20 @@
 {
-  "ADK Agent": {
+  "ADK LlmAgent": {
     "prefix": "adk-agent",
     "body": [
       "from google.adk.agents import LlmAgent",
       "",
       "${1:agent_name} = LlmAgent(",
       "    name='${2:my_agent}',",
-      "    model='${3:gemini-2.0-flash}',",
-      "    description='${4:Agent description}',",
+      "    model='${3:gemini-2.5-flash}',",
+      "    description='${4:What this agent does and when to use it.}',",
       "    instruction='${5:You are a helpful assistant.}',",
       "    tools=[${6}],",
       ")"
     ],
     "description": "ADK LlmAgent definition"
   },
+
   "ADK Root Agent": {
     "prefix": "adk-root",
     "body": [
@@ -21,66 +22,242 @@
       "",
       "root_agent = LlmAgent(",
       "    name='${1:my_agent}',",
-      "    model='${2:gemini-2.0-flash}',",
-      "    description='${3:Root agent}',",
+      "    model='${2:gemini-2.5-flash}',",
+      "    description='${3:Root agent — entry point for this ADK app.}',",
       "    instruction='${4:You are a helpful assistant.}',",
       "    tools=[${5}],",
       ")"
     ],
-    "description": "ADK root_agent (required entry point)"
+    "description": "ADK root_agent — required entry point variable"
   },
+
+  "ADK Complete Agent File": {
+    "prefix": "adk-agent-file",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "",
+      "",
+      "def ${1:my_tool}(${2:query}: str) -> str:",
+      "    \"\"\"${3:Describe what this tool does. Be specific — the LLM reads this.}",
+      "",
+      "    Args:",
+      "        ${2}: ${4:What this argument is.}",
+      "",
+      "    Returns:",
+      "        ${5:What this function returns.}",
+      "    \"\"\"",
+      "    ${6:return ''}",
+      "",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${7:my_agent}',",
+      "    model='${8:gemini-2.5-flash}',",
+      "    description='${9:A helpful agent.}',",
+      "    instruction='${10:You are a helpful assistant. Use tools when needed.}',",
+      "    tools=[${1:my_tool}],",
+      ")"
+    ],
+    "description": "Complete agent.py file — LlmAgent with one tool"
+  },
+
+  "ADK __init__.py": {
+    "prefix": "adk-init",
+    "body": [
+      "from ${1:. }.agent import root_agent",
+      "",
+      "__all__ = ['root_agent']"
+    ],
+    "description": "ADK __init__.py — exports root_agent for discovery"
+  },
+
   "ADK Tool (function)": {
     "prefix": "adk-tool",
     "body": [
       "def ${1:tool_name}(${2:param}: ${3:str}) -> ${4:str}:",
-      "    \"\"\"${5:Tool description. Explain what this tool does and when to use it.}",
+      "    \"\"\"${5:Describe what this tool does. Be specific — the LLM reads this.}",
       "",
       "    Args:",
-      "        ${2}: ${6:Parameter description}",
+      "        ${2}: ${6:What this argument is.}",
       "",
       "    Returns:",
-      "        ${7:Return value description}",
+      "        ${7:What this function returns.}",
       "    \"\"\"",
       "    ${0:return ''}"
     ],
-    "description": "ADK tool function (docstring required for LLM)"
+    "description": "ADK tool function — docstring is required for the LLM to understand when to call it"
   },
+
+  "ADK Google Search Tool": {
+    "prefix": "adk-google-search",
+    "body": [
+      "from google.adk.tools import google_search",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${1:search_agent}',",
+      "    model='${2:gemini-2.5-flash}',",
+      "    description='${3:Agent with Google Search capability.}',",
+      "    instruction='${4:Use Google Search to answer questions about current events.}',",
+      "    tools=[google_search],",
+      ")"
+    ],
+    "description": "ADK built-in Google Search tool"
+  },
+
+  "ADK Agent as Tool (AgentTool)": {
+    "prefix": "adk-agent-tool",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "from google.adk.tools import AgentTool",
+      "",
+      "${1:sub_agent} = LlmAgent(",
+      "    name='${2:sub_agent}',",
+      "    model='${3:gemini-2.5-flash}',",
+      "    description='${4:What this sub-agent does. This is shown to the parent LLM.}',",
+      "    instruction='${5:You specialize in...}',",
+      "    tools=[${6}],",
+      ")",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${7:root_agent}',",
+      "    model='${8:gemini-2.5-flash}',",
+      "    description='${9:Orchestrator agent.}',",
+      "    instruction='${10:Delegate tasks to sub-agents as appropriate.}',",
+      "    tools=[AgentTool(agent=${1:sub_agent})],",
+      ")"
+    ],
+    "description": "ADK AgentTool — wrap an agent as a callable tool for another agent"
+  },
+
+  "ADK MCP Toolset": {
+    "prefix": "adk-mcp",
+    "body": [
+      "from google.adk.agents import LlmAgent",
+      "from google.adk.tools import MCPToolset",
+      "from mcp import StdioServerParameters",
+      "",
+      "root_agent = LlmAgent(",
+      "    name='${1:mcp_agent}',",
+      "    model='${2:gemini-2.5-flash}',",
+      "    description='${3:Agent with MCP tools.}',",
+      "    instruction='${4:Use the available tools to help the user.}',",
+      "    tools=[",
+      "        MCPToolset(",
+      "            connection_params=StdioServerParameters(",
+      "                command='${5:npx}',",
+      "                args=['${6:-y}', '${7:@modelcontextprotocol/server-filesystem}', '${8:.}'],",
+      "            ),",
+      "        ),",
+      "    ],",
+      ")"
+    ],
+    "description": "ADK MCPToolset — connect to an MCP server via stdio"
+  },
+
+  "ADK SequentialAgent": {
+    "prefix": "adk-sequential",
+    "body": [
+      "from google.adk.agents import SequentialAgent",
+      "",
+      "${1:pipeline} = SequentialAgent(",
+      "    name='${2:pipeline}',",
+      "    description='${3:Runs sub-agents in sequence, passing state between them.}',",
+      "    sub_agents=[${4:step1, step2}],",
+      ")"
+    ],
+    "description": "ADK SequentialAgent — run sub-agents one after another"
+  },
+
+  "ADK ParallelAgent": {
+    "prefix": "adk-parallel",
+    "body": [
+      "from google.adk.agents import ParallelAgent",
+      "",
+      "${1:parallel} = ParallelAgent(",
+      "    name='${2:parallel}',",
+      "    description='${3:Runs sub-agents concurrently and merges results.}',",
+      "    sub_agents=[${4:agent1, agent2}],",
+      ")"
+    ],
+    "description": "ADK ParallelAgent — run sub-agents concurrently"
+  },
+
+  "ADK LoopAgent": {
+    "prefix": "adk-loop",
+    "body": [
+      "from google.adk.agents import LoopAgent",
+      "",
+      "${1:loop} = LoopAgent(",
+      "    name='${2:loop}',",
+      "    description='${3:Repeats the sub-agent until a condition is met or max iterations reached.}',",
+      "    sub_agents=[${4:agent}],",
+      "    max_iterations=${5:5},",
+      ")"
+    ],
+    "description": "ADK LoopAgent — repeat a sub-agent up to max_iterations times"
+  },
+
+  "ADK Session State": {
+    "prefix": "adk-state",
+    "body": [
+      "# Session-scoped state (cleared when session ends)",
+      "tool_context.state['${1:key}'] = ${2:value}",
+      "value = tool_context.state.get('${1:key}', ${3:None})",
+      "",
+      "# User-scoped state (persists across sessions for this user)",
+      "tool_context.state['user:${4:key}'] = ${5:value}",
+      "",
+      "# App-scoped state (global across all users and sessions)",
+      "tool_context.state['app:${6:key}'] = ${7:value}"
+    ],
+    "description": "ADK session state — session, user, and app scoped variants"
+  },
+
   "ADK Before Model Callback": {
     "prefix": "adk-before-model",
     "body": [
-      "from google.adk.agents import LlmAgent, CallbackContext",
-      "from google.adk.models import LlmRequest",
+      "from google.adk.agents.callback_context import CallbackContext",
+      "from google.adk.models.llm_request import LlmRequest",
       "from typing import Optional",
       "",
       "def before_model_callback(",
       "    callback_context: CallbackContext,",
       "    llm_request: LlmRequest,",
       ") -> Optional[LlmRequest]:",
-      "    \"\"\"${1:Modify the request before it is sent to the model.}\"\"\"",
-      "    ${0:return None  # Return None to proceed normally}"
+      "    \"\"\"${1:Inspect or modify the LLM request before it is sent.}",
+      "",
+      "    Return None to proceed normally, or return a modified LlmRequest.",
+      "    To short-circuit (skip the model), raise an exception.",
+      "    \"\"\"",
+      "    ${0:return None}"
     ],
-    "description": "ADK before_model_callback"
+    "description": "ADK before_model_callback — intercept LLM requests"
   },
+
   "ADK After Model Callback": {
     "prefix": "adk-after-model",
     "body": [
-      "from google.adk.agents import CallbackContext",
-      "from google.adk.models import LlmResponse",
+      "from google.adk.agents.callback_context import CallbackContext",
+      "from google.adk.models.llm_response import LlmResponse",
       "from typing import Optional",
       "",
       "def after_model_callback(",
       "    callback_context: CallbackContext,",
       "    llm_response: LlmResponse,",
       ") -> Optional[LlmResponse]:",
-      "    \"\"\"${1:Post-process the model response.}\"\"\"",
-      "    ${0:return None  # Return None to use original response}"
+      "    \"\"\"${1:Post-process or replace the model response.}",
+      "",
+      "    Return None to use the original response unchanged.",
+      "    \"\"\"",
+      "    ${0:return None}"
     ],
-    "description": "ADK after_model_callback"
+    "description": "ADK after_model_callback — post-process LLM responses"
   },
+
   "ADK Before Tool Callback": {
     "prefix": "adk-before-tool",
     "body": [
-      "from google.adk.tools import BaseTool, ToolContext",
+      "from google.adk.tools import BaseTool",
+      "from google.adk.tools.tool_context import ToolContext",
       "from typing import Optional",
       "",
       "def before_tool_callback(",
@@ -88,88 +265,53 @@
       "    args: dict,",
       "    tool_context: ToolContext,",
       ") -> Optional[dict]:",
-      "    \"\"\"${1:Intercept tool calls — return a dict to skip actual execution.}\"\"\"",
-      "    ${0:return None  # Return None to proceed normally}"
-    ],
-    "description": "ADK before_tool_callback"
-  },
-  "ADK Sequential Agent": {
-    "prefix": "adk-sequential",
-    "body": [
-      "from google.adk.agents import SequentialAgent",
+      "    \"\"\"${1:Intercept a tool call before execution.}",
       "",
-      "${1:pipeline} = SequentialAgent(",
-      "    name='${2:pipeline}',",
-      "    sub_agents=[${3:agent1, agent2}],",
-      "    description='${4:Sequential pipeline}',",
-      ")"
-    ],
-    "description": "ADK SequentialAgent"
-  },
-  "ADK Parallel Agent": {
-    "prefix": "adk-parallel",
-    "body": [
-      "from google.adk.agents import ParallelAgent",
-      "",
-      "${1:parallel} = ParallelAgent(",
-      "    name='${2:parallel}',",
-      "    sub_agents=[${3:agent1, agent2}],",
-      "    description='${4:Parallel execution}',",
-      ")"
-    ],
-    "description": "ADK ParallelAgent"
-  },
-  "ADK Loop Agent": {
-    "prefix": "adk-loop",
-    "body": [
-      "from google.adk.agents import LoopAgent",
-      "",
-      "${1:loop} = LoopAgent(",
-      "    name='${2:loop}',",
-      "    sub_agents=[${3:agent}],",
-      "    max_iterations=${4:5},",
-      "    description='${5:Looping agent}',",
-      ")"
-    ],
-    "description": "ADK LoopAgent"
-  },
-  "ADK Session State Access": {
-    "prefix": "adk-state",
-    "body": [
-      "# Read from session state",
-      "value = tool_context.state['${1:key}']",
-      "",
-      "# Write to session state",
-      "tool_context.state['${2:key}'] = ${3:value}"
-    ],
-    "description": "ADK session state read/write"
-  },
-  "ADK Full Agent File": {
-    "prefix": "adk-agent-file",
-    "body": [
-      "from google.adk.agents import LlmAgent",
-      "",
-      "",
-      "def ${1:greet}(name: str) -> str:",
-      "    \"\"\"Greet a person by name.",
-      "",
-      "    Args:",
-      "        name: The person's name.",
-      "",
-      "    Returns:",
-      "        A greeting string.",
+      "    Return None to proceed normally.",
+      "    Return a dict to skip execution and use it as the tool result.",
       "    \"\"\"",
-      "    return f'Hello, {name}!'",
-      "",
-      "",
-      "root_agent = LlmAgent(",
-      "    name='${2:my_agent}',",
-      "    model='${3:gemini-2.0-flash}',",
-      "    description='${4:A helpful agent}',",
-      "    instruction='${5:You are a helpful assistant. Use tools when needed.}',",
-      "    tools=[${1:greet}],",
-      ")"
+      "    ${0:return None}"
     ],
-    "description": "ADK complete agent.py file template"
+    "description": "ADK before_tool_callback — intercept tool calls"
+  },
+
+  "ADK After Tool Callback": {
+    "prefix": "adk-after-tool",
+    "body": [
+      "from google.adk.tools import BaseTool",
+      "from google.adk.tools.tool_context import ToolContext",
+      "from typing import Optional",
+      "",
+      "def after_tool_callback(",
+      "    tool: BaseTool,",
+      "    args: dict,",
+      "    tool_context: ToolContext,",
+      "    tool_response: dict,",
+      ") -> Optional[dict]:",
+      "    \"\"\"${1:Post-process a tool result before it is returned to the model.}",
+      "",
+      "    Return None to use the original result.",
+      "    Return a dict to replace the result.",
+      "    \"\"\"",
+      "    ${0:return None}"
+    ],
+    "description": "ADK after_tool_callback — post-process tool results"
+  },
+
+  "ADK .env Template": {
+    "prefix": "adk-env",
+    "body": [
+      "# ADK Configuration",
+      "# Choose ONE authentication method:",
+      "",
+      "# Option A — Gemini API (Google AI Studio)",
+      "GOOGLE_API_KEY=${1:your_api_key_here}",
+      "",
+      "# Option B — Vertex AI (Google Cloud)",
+      "# GOOGLE_GENAI_USE_VERTEXAI=true",
+      "# GOOGLE_CLOUD_PROJECT=${2:your_project_id}",
+      "# GOOGLE_CLOUD_LOCATION=${3:us-central1}"
+    ],
+    "description": "ADK .env file template — Gemini API key or Vertex AI credentials"
   }
 }

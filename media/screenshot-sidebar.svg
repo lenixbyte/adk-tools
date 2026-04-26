@@ -8,7 +8,6 @@
     </clipPath>
   </defs>
 
-  <!-- Window frame with shadow -->
   <g filter="url(#win-shadow)">
     <rect x="10" y="8" width="360" height="544" rx="12" fill="#252526"/>
   </g>
@@ -16,11 +15,9 @@
   <g clip-path="url(#win-clip)" transform="translate(10,8)">
     <!-- Title bar -->
     <rect width="360" height="32" fill="#323232"/>
-    <!-- Traffic lights -->
     <circle cx="20" cy="16" r="6" fill="#ff5f56"/>
     <circle cx="40" cy="16" r="6" fill="#ffbd2e"/>
     <circle cx="60" cy="16" r="6" fill="#27c93f"/>
-    <!-- Title -->
     <text x="180" y="21" fill="#ababab" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" text-anchor="middle">ADK Project</text>
 
     <!-- Sidebar background -->
@@ -29,107 +26,111 @@
     <!-- Panel header -->
     <rect y="32" width="360" height="28" fill="#252526"/>
     <text x="12" y="51" fill="#bdbdbd" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="700" letter-spacing="0.8">ADK PROJECT</text>
-    <!-- Action icons -->
     <text x="308" y="51" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="16" text-anchor="middle">+</text>
     <text x="336" y="51" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="14" text-anchor="middle">↻</text>
-    <!-- Divider -->
     <line x1="0" y1="60" x2="360" y2="60" stroke="#3d3d3d" stroke-width="1"/>
 
-    <!-- Project row -->
-    <rect y="60" width="360" height="24" fill="#252526"/>
-    <!-- Folder icon -->
+    <!-- Project row (y=60, h=24) -->
     <rect x="14" y="69" width="15" height="11" rx="1.5" fill="#e2a950"/>
     <rect x="14" y="67" width="7" height="4" rx="1" fill="#e2a950"/>
-    <text x="34" y="80" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">my_agent</text>
-    <text x="216" y="80" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">python · uv</text>
+    <text x="34" y="80" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">support_agent</text>
+    <text x="226" y="80" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">python · uv</text>
 
-    <!-- Model row -->
-    <rect y="84" width="360" height="24" fill="#252526"/>
-    <!-- Diamond icon -->
+    <!-- Model row (y=84, h=24) -->
     <polygon points="22,90 26,96 22,102 18,96" fill="#4ec9b0"/>
-    <text x="34" y="100" fill="#4ec9b0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">gemini-2.0-flash</text>
-    <text x="220" y="100" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">click to switch</text>
+    <text x="34" y="100" fill="#4ec9b0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">gemini-2.5-flash</text>
+    <text x="222" y="100" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">click to switch</text>
 
-    <!-- Divider -->
     <line x1="0" y1="108" x2="360" y2="108" stroke="#3d3d3d" stroke-width="0.5"/>
 
-    <!-- Development section (expanded) -->
-    <rect y="108" width="360" height="24" fill="#252526"/>
+    <!-- Development section header (y=108, h=24) -->
     <text x="12" y="125" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▾</text>
-    <!-- Rocket icon -->
     <text x="26" y="125" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Development</text>
 
-    <!-- Web UI — running (green) -->
+    <!-- Web UI — running (y=132, h=22) -->
     <rect y="132" width="360" height="22" fill="#1a2e1a"/>
-    <!-- Green dot -->
     <circle cx="28" cy="143" r="4" fill="#4daa4d"/>
-    <text x="38" y="148" fill="#4daa4d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500">Web UI  ●</text>
-    <text x="226" y="148" fill="#4daa4d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">localhost:8000</text>
+    <text x="38" y="147" fill="#4daa4d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="500">Web UI  ●</text>
+    <text x="226" y="147" fill="#4daa4d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">localhost:8000</text>
 
-    <!-- Run API Server -->
-    <rect y="154" width="360" height="22" fill="#252526"/>
-    <!-- Play icon -->
-    <polygon points="26,162 26,172 34,167" fill="#858585"/>
+    <!-- Run API Server (y=154, h=22) -->
+    <polygon points="26,163 26,173 34,168" fill="#858585"/>
     <text x="38" y="169" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Run API Server</text>
 
-    <!-- Run CLI -->
-    <rect y="176" width="360" height="22" fill="#252526"/>
-    <!-- Terminal icon -->
-    <rect x="22" y="181" width="14" height="11" rx="1" fill="none" stroke="#858585" stroke-width="1.5"/>
-    <text x="26" y="190" fill="#858585" font-family="monospace" font-size="8">&gt;_</text>
+    <!-- Run CLI (y=176, h=22) -->
+    <rect x="21" y="181" width="14" height="10" rx="1" fill="none" stroke="#858585" stroke-width="1.5"/>
+    <text x="25" y="190" fill="#858585" font-family="monospace" font-size="8">&gt;_</text>
     <text x="38" y="191" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Run CLI (adk run)</text>
 
-    <!-- Open in Browser — shown because server running -->
-    <rect y="198" width="360" height="22" fill="#252526"/>
-    <rect x="22" y="203" width="14" height="11" rx="1" fill="none" stroke="#858585" stroke-width="1.5"/>
+    <!-- Open in Browser (y=198, h=22) -->
+    <rect x="21" y="203" width="14" height="10" rx="1" fill="none" stroke="#858585" stroke-width="1.5"/>
     <text x="38" y="213" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Open in Browser</text>
-    <text x="234" y="213" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">localhost:8000</text>
+    <text x="234" y="213" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">:8000</text>
 
-    <!-- Open Agent File -->
-    <rect y="220" width="360" height="22" fill="#252526"/>
+    <!-- Open Agent File (y=220, h=22) -->
+    <rect x="21" y="225" width="11" height="13" rx="1" fill="none" stroke="#858585" stroke-width="1.5"/>
     <text x="38" y="235" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Open Agent File</text>
 
-    <!-- Edit .env -->
-    <rect y="242" width="360" height="22" fill="#252526"/>
+    <!-- Edit .env (y=242, h=22) -->
     <text x="38" y="257" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Edit .env</text>
 
-    <!-- Auth Setup -->
-    <rect y="264" width="360" height="22" fill="#252526"/>
+    <!-- Auth Setup (y=264, h=22) -->
     <text x="38" y="279" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Auth Setup</text>
 
-    <!-- Run Options -->
-    <rect y="286" width="360" height="22" fill="#252526"/>
+    <!-- Run Options (y=286, h=22) -->
     <text x="38" y="301" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Run Options</text>
 
-    <!-- Divider -->
-    <line x1="0" y1="308" x2="360" y2="308" stroke="#3d3d3d" stroke-width="0.5"/>
+    <!-- Agent Graph (y=308, h=22) -->
+    <circle cx="25" cy="319" r="5" fill="none" stroke="#858585" stroke-width="1.5"/>
+    <circle cx="25" cy="319" r="2" fill="#858585"/>
+    <circle cx="34" cy="314" r="3" fill="none" stroke="#858585" stroke-width="1.5"/>
+    <line x1="30" y1="317" x2="32" y2="315" stroke="#858585" stroke-width="1.2"/>
+    <text x="42" y="323" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Agent Graph</text>
 
-    <!-- Deployment section (collapsed) -->
-    <rect y="308" width="360" height="24" fill="#252526"/>
-    <text x="12" y="325" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▸</text>
-    <text x="26" y="325" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Deployment</text>
+    <!-- Debug Agent (y=330, h=22) -->
+    <circle cx="28" cy="341" r="5" fill="#f44747"/>
+    <circle cx="28" cy="341" r="5" fill="none" stroke="#cc2222" stroke-width="1"/>
+    <text x="42" y="345" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Debug Agent</text>
 
-    <!-- Evaluation section (collapsed) -->
-    <rect y="332" width="360" height="24" fill="#252526"/>
-    <text x="12" y="349" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▸</text>
-    <text x="26" y="349" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Evaluation</text>
+    <line x1="0" y1="352" x2="360" y2="352" stroke="#3d3d3d" stroke-width="0.5"/>
 
-    <!-- Help & Diagnostics (collapsed) -->
-    <rect y="356" width="360" height="24" fill="#252526"/>
-    <text x="12" y="373" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▸</text>
-    <text x="26" y="373" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Help &amp; Diagnostics</text>
+    <!-- Deployment section (y=352, h=24, collapsed) -->
+    <text x="12" y="369" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▸</text>
+    <text x="26" y="369" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Deployment</text>
 
-    <!-- Status bar at bottom -->
-    <rect y="502" width="360" height="22" fill="#cc6633"/>
-    <!-- ADK badge -->
-    <text x="10" y="518" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500">⚡ ADK · uv</text>
-    <!-- Port button -->
-    <rect x="106" y="504" width="68" height="16" rx="3" fill="#b35520"/>
-    <text x="140" y="516" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" text-anchor="middle">📡 :8000</text>
-    <!-- Stop button -->
-    <rect x="178" y="504" width="54" height="16" rx="3" fill="#b35520"/>
-    <text x="205" y="516" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" text-anchor="middle">■ Stop</text>
-    <!-- Hot reload badge -->
-    <text x="238" y="518" fill="#e2c08d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">↻ hot reload</text>
+    <line x1="0" y1="376" x2="360" y2="376" stroke="#3d3d3d" stroke-width="0.5"/>
+
+    <!-- Evaluation section (y=376, h=24, expanded) -->
+    <text x="12" y="393" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▾</text>
+    <text x="26" y="393" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Evaluation</text>
+
+    <!-- Run Eval (y=400, h=22) -->
+    <polygon points="26,408 26,418 34,413" fill="#858585"/>
+    <text x="38" y="415" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Run Eval</text>
+
+    <!-- Generate Eval Cases (y=422, h=22) -->
+    <text x="25" y="437" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="16" font-weight="300">+</text>
+    <text x="38" y="437" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Generate Eval Cases</text>
+
+    <!-- Eval History (y=444, h=22) -->
+    <rect x="21" y="450" width="3" height="10" rx="1" fill="#858585"/>
+    <rect x="26" y="454" width="3" height="6" rx="1" fill="#858585"/>
+    <rect x="31" y="447" width="3" height="13" rx="1" fill="#858585"/>
+    <text x="38" y="459" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Eval History</text>
+
+    <line x1="0" y1="466" x2="360" y2="466" stroke="#3d3d3d" stroke-width="0.5"/>
+
+    <!-- Help &amp; Diagnostics (y=466, h=24, collapsed) -->
+    <text x="12" y="483" fill="#858585" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11">▸</text>
+    <text x="26" y="483" fill="#cccccc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13">Help &amp; Diagnostics</text>
+
+    <!-- Status bar (y=522, h=22) -->
+    <rect y="522" width="360" height="22" fill="#cc6633"/>
+    <text x="10" y="538" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500">⚡ ADK · uv</text>
+    <rect x="106" y="524" width="68" height="16" rx="3" fill="#b35520"/>
+    <text x="140" y="536" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" text-anchor="middle">📡 :8000</text>
+    <rect x="178" y="524" width="54" height="16" rx="3" fill="#b35520"/>
+    <text x="205" y="536" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" text-anchor="middle">■ Stop</text>
+    <text x="238" y="538" fill="#e2c08d" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">↻ hot reload</text>
   </g>
 </svg>

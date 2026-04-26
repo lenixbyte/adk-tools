@@ -10,7 +10,10 @@ import { showGettingStarted } from './webviews/gettingStarted';
 import { runCli } from './commands/runner';
 import { switchModel } from './commands/modelSwitcher';
 import { showAuthWizard } from './commands/authWizard';
-import { runEval, generateEvalCases } from './commands/evalRunner';
+import { runEval, generateEvalCases, showEvalHistory } from './commands/evalRunner';
+import { debugAgent } from './commands/debugAgent';
+import { showAgentGraph } from './commands/agentGraph';
+import { registerChatParticipant } from './commands/chatParticipant';
 import { initSettings, showRunOptionsMenu, getRunSettings } from './utils/settings';
 import { detectAdkProject } from './utils/detect';
 import { detectEnv } from './utils/env';
@@ -60,6 +63,11 @@ export function activate(context: vscode.ExtensionContext): void {
     // ── Eval commands ─────────────────────────────────────────────────────────
     vscode.commands.registerCommand('adk.runEval', runEval),
     vscode.commands.registerCommand('adk.createEvalFile', generateEvalCases),
+    vscode.commands.registerCommand('adk.evalHistory', () => showEvalHistory(context)),
+
+    // ── Development tools ─────────────────────────────────────────────────────
+    vscode.commands.registerCommand('adk.agentGraph', () => showAgentGraph(context)),
+    vscode.commands.registerCommand('adk.debugAgent', debugAgent),
 
     // ── UI / help commands ────────────────────────────────────────────────────
     vscode.commands.registerCommand('adk.showMenu', showMenu),
@@ -75,6 +83,9 @@ export function activate(context: vscode.ExtensionContext): void {
       tree.refresh();
     }),
   );
+
+  // Register chat participant (@adk)
+  registerChatParticipant(context);
 
   log('ADK Tools activated.');
 
@@ -120,6 +131,9 @@ async function showMenu(): Promise<void> {
     { label: '$(stop-circle) Stop All Servers', command: 'adk.stopServers' },
     { label: '$(browser) Open Browser', description: `localhost:${settings.port}`, command: 'adk.openWebBrowser' },
     { kind: vscode.QuickPickItemKind.Separator, label: '' },
+    { label: '$(type-hierarchy) Agent Graph', description: 'visualize agent hierarchy', command: 'adk.agentGraph' },
+    { label: '$(debug-alt) Debug Agent', description: 'generate launch.json for debugpy', command: 'adk.debugAgent' },
+    { kind: vscode.QuickPickItemKind.Separator, label: '' },
     { label: '$(symbol-enum) Switch Model', description: 'change Gemini/Claude model', command: 'adk.switchModel' },
     { label: '$(settings-gear) Run Options', description: 'port · hot reload · log level', command: 'adk.runOptions' },
     { label: '$(shield) Auth Setup', description: 'API key or Vertex AI', command: 'adk.authWizard' },
@@ -127,6 +141,7 @@ async function showMenu(): Promise<void> {
     { label: '$(cloud-upload) Deploy Agent', description: 'Cloud Run · Agent Engine · GKE', command: 'adk.deploy' },
     { label: '$(beaker) Run Eval', description: 'adk eval', command: 'adk.runEval' },
     { label: '$(add) Generate Eval Cases', command: 'adk.createEvalFile' },
+    { label: '$(history) Eval History', description: 'view pass rates over time', command: 'adk.evalHistory' },
     { kind: vscode.QuickPickItemKind.Separator, label: '' },
     { label: '$(go-to-file) Open Agent File', command: 'adk.openConfig' },
     { label: '$(key) Edit .env', description: 'environment variables', command: 'adk.openEnv' },
