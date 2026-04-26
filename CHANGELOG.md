@@ -1,12 +1,3 @@
-## v1.0.7 — 2026-04-25
-
-### Bug Fixes
-- pass AGENT_MODULE_FILE_PATH to eval_set generate_eval_cases command
-
-### Other
-- ci: add Open VSX publish step to release workflow
-
-
 # Changelog
 
 ## v1.0.9 — 2026-04-27
@@ -40,6 +31,10 @@
 ### Fixed
 
 - Pass `AGENT_MODULE_FILE_PATH` to `eval_set generate_eval_cases` command
+
+### Other
+
+- CI: add Open VSX publish step to release workflow
 
 ---
 
